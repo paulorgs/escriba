@@ -9,7 +9,11 @@ import fse from 'fs-extra';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const md = new MarkdownIt();
+const md = new MarkdownIt({
+  html: true,        // Permite HTML nos arquivos Markdown
+  breaks: true,      // Converte quebras de linha em <br>
+  linkify: true      // Converte URLs em links automaticamente
+});
 
 // Registra helpers do Handlebars
 Handlebars.registerHelper('eq', function(a, b) {
@@ -151,6 +155,18 @@ Handlebars.registerHelper('seoMeta', function(data) {
   return new Handlebars.SafeString(metaTags);
 });
 
+// Helper para gerar botão de gerenciamento de cookies
+Handlebars.registerHelper('cookieButton', function(text, className) {
+  const buttonText = text || 'Configurar Cookies';
+  const buttonClass = className || 'cookie-manage-btn';
+  
+  return new Handlebars.SafeString(`
+    <button class="${buttonClass}" onclick="if(window.cookieConsent) window.cookieConsent.resetConsent(); else alert('Sistema de cookies carregando...');">
+      🍪 ${buttonText}
+    </button>
+  `);
+});
+
 const contentDir = path.join(__dirname, 'content');
 const templatesDir = path.join(__dirname, 'templates');
 const indexPath = path.join(__dirname, 'templates/index.hbs');
@@ -246,6 +262,19 @@ async function buildSite() {
     }
   } catch (error) {
     console.warn('⚠️  Não foi possível copiar o arquivo CSS:', error.message);
+  }
+
+  // Copia o arquivo JavaScript do consentimento de cookies
+  const cookieConsentJsPath = path.join(__dirname, 'templates/cookie-consent.js');
+  const publicCookieConsentJsPath = path.join(outputDir, 'cookie-consent.js');
+  
+  try {
+    if (fsSync.existsSync(cookieConsentJsPath)) {
+      await fs.copyFile(cookieConsentJsPath, publicCookieConsentJsPath);
+      console.log('🍪 Cookie consent JS copiado para public/');
+    }
+  } catch (error) {
+    console.warn('⚠️  Não foi possível copiar o arquivo cookie-consent.js:', error.message);
   }
 
   const indexTemplate = Handlebars.compile(await fs.readFile(indexPath, 'utf-8'));
