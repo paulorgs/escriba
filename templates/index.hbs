@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{siteTitle}}</title>
+</head>
+<body>
+  <h1>{{siteTitle}}</h1>
+  <ul>
+    {{#each posts}}
+      <li>
+        <a href="{{url}}">{{title}}</a>
+        <small>{{date}}</small>
+      </li>
+    {{/each}}
+  </ul>
+</body>
+</html>
