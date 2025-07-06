@@ -1,0 +1,49 @@
+{
+  "site": {
+    "title": "Escriba Blog",
+    "description": "Gerador de sites estáticos moderno e eficiente - Transforme Markdown em sites profissionais",
+    "url": "https://escriba.dev",
+    "author": "Equipe Escriba",
+    "language": "pt-BR",
+    "twitterSite": "@escriba_dev",
+    "ogImage": "/images/og-escriba-default.jpg",
+    "favicon": "/favicon.ico",
+    "charset": "UTF-8",
+    "viewport": "width=device-width, initial-scale=1.0"
+  },
+  "defaults": {
+    "robots": "index,follow",
+    "ogType": "website",
+    "twitterCard": "summary_large_image",
+    "ogLocale": "pt_BR",
+    "language": "pt-BR"
+  },
+  "social": {
+    "twitter": "@escriba_dev",
+    "github": "https://github.com/escriba/escriba",
+    "linkedin": "https://linkedin.com/company/escriba",
+    "email": "contato@escriba.dev"
+  },
+  "analytics": {
+    "googleAnalytics": "UA-XXXXXXXXX-X",
+    "googleTagManager": "GTM-XXXXXXX",
+    "facebookPixel": "XXXXXXXXXXXXXXXXX"
+  },
+  "performance": {
+    "preload": [
+      "/style.css",
+      "/fonts/main.woff2"
+    ],
+    "prefetch": [
+      "/images/hero-bg.jpg"
+    ]
+  },
+  "seo": {
+    "sitemap": true,
+    "robots": true,
+    "rss": true,
+    "generateJsonLd": true,
+    "minifyHtml": false,
+    "optimizeImages": true
+  }
+}

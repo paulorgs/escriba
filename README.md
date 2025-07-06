@@ -1,5 +1,9 @@
-# Escriba 📝
-
+# Escriba- 🎯 **Layout automático**: Sistema inteligente de seleção de layout
+- 🎨 **Estilos padronizados**: CSS moderno e consistente em todos os layouts
+- 📱 **Design responsivo**: Layouts otimizados para todos os dispositivos
+- � **SEO otimizado**: Meta tags, Open Graph, Twitter Cards e dados estruturados
+- 📊 **Configuração SEO global**: Valores padrão centralizados para todo o site
+- 📁 **Estrutura recursiva**: Busca arquivos Markdown em todas as subpastas
 Um gerador de site estático simples e eficiente construído em Node.js. Escriba converte arquivos Markdown em um site estático completo usando templates Handlebars.
 
 ## ✨ Características
@@ -44,6 +48,7 @@ escriba/
 │   ├── layout-page.hbs   # Layout para páginas
 │   ├── index.hbs         # Template da página inicial
 │   └── style.css         # Estilos CSS (copiado para public/)
+├── seo.config.json   # Configuração global de SEO
 ├── public/           # Site gerado (pasta de saída)
 ├── build.js          # Script de build
 └── package.json
@@ -60,6 +65,8 @@ title: Meu Post
 date: 2025-07-01
 layout: layout-post
 author: Seu Nome
+description: "Descrição do post para SEO"
+keywords: "palavra-chave1, palavra-chave2"
 ---
 
 Conteúdo do seu post em **Markdown**!
@@ -71,6 +78,7 @@ Conteúdo do seu post em **Markdown**!
 title: Sobre Nós
 layout: layout-page
 subtitle: Conheça nossa história
+description: "Página sobre a nossa empresa"
 ---
 
 Conteúdo da página estática...
@@ -185,7 +193,169 @@ O Escriba utiliza um **sistema de CSS padronizado** para manter consistência vi
 - **Índice**: Grid de posts com estatísticas e badges
 - **Navegação**: Botões consistentes entre todas as páginas
 
-## 📦 Dependências
+## � Sistema de SEO
+
+O Escriba inclui um **sistema completo de SEO** que gera automaticamente meta tags otimizadas para mecanismos de busca e redes sociais.
+
+### Características do SEO:
+- **Meta tags básicas**: title, description, keywords, author, robots
+- **Open Graph**: Otimização para Facebook, LinkedIn e outras redes sociais
+- **Twitter Cards**: Compartilhamento otimizado no Twitter
+- **Dados estruturados**: Schema.org JSON-LD para melhor indexação
+- **URLs canônicas**: Evita problemas de conteúdo duplicado
+- **Configuração global**: Valores padrão centralizados
+
+### Configuração Global (seo.config.json)
+
+Crie um arquivo `seo.config.json` na raiz do projeto:
+
+```json
+{
+  "site": {
+    "title": "Meu Blog",
+    "description": "Um blog criado com Escriba - gerador de sites estáticos",
+    "url": "https://meusite.com",
+    "author": "Seu Nome",
+    "language": "pt-BR",
+    "twitterSite": "@meusite",
+    "ogImage": "/images/og-default.jpg"
+  },
+  "defaults": {
+    "robots": "index,follow",
+    "ogType": "website",
+    "twitterCard": "summary_large_image"
+  },
+  "social": {
+    "twitter": "@meusite",
+    "facebook": "meusite",
+    "instagram": "@meusite"
+  }
+}
+```
+
+### Front Matter SEO
+
+Adicione campos de SEO ao front matter dos seus arquivos Markdown:
+
+#### SEO Básico:
+```yaml
+---
+title: "Título da Página"
+description: "Descrição para mecanismos de busca (máx. 160 caracteres)"
+keywords: "palavra-chave1, palavra-chave2, palavra-chave3"
+author: "Nome do Autor"
+canonical: "https://seusite.com/url-canonica.html"
+robots: "index,follow"
+---
+```
+
+#### Open Graph (Facebook, LinkedIn):
+```yaml
+---
+# Open Graph
+ogTitle: "Título para redes sociais"
+ogDescription: "Descrição para redes sociais"
+ogImage: "/images/imagem-1200x630.jpg"
+ogType: "article"  # ou "website"
+ogLocale: "pt_BR"
+---
+```
+
+#### Twitter Cards:
+```yaml
+---
+# Twitter Cards
+twitterCard: "summary_large_image"
+twitterSite: "@seusite"
+twitterCreator: "@seuautor"
+twitterTitle: "Título específico para Twitter"
+twitterDescription: "Descrição específica para Twitter"
+twitterImage: "/images/twitter-card.jpg"
+---
+```
+
+#### Dados Estruturados (Schema.org):
+```yaml
+---
+# Schema.org
+schemaType: "BlogPosting"  # ou "AboutPage", "WebPage"
+schemaAuthor: "Nome do Autor"
+schemaPublisher: "Nome do Site"
+schemaImage: "/images/schema-image.jpg"
+schemaWordCount: 1500
+articleSection: "Categoria"
+articleTag: ["tag1", "tag2"]
+---
+```
+
+### Exemplo Completo de SEO
+
+```yaml
+---
+title: "Como Criar um Blog com Escriba"
+date: 2025-07-02
+layout: layout-post
+author: "Paulo Silva"
+category: "tutorial"
+tags: ["blog", "escriba", "tutorial"]
+
+# SEO Básico
+description: "Aprenda passo a passo como criar um blog incrível usando o Escriba"
+keywords: "blog, escriba, tutorial, static site generator"
+canonical: "https://meusite.com/como-criar-blog-escriba.html"
+robots: "index,follow"
+
+# Open Graph
+ogTitle: "Como Criar um Blog com Escriba - Tutorial Completo"
+ogDescription: "Passo a passo para criar um blog profissional"
+ogImage: "/images/tutorial-blog-og.jpg"
+ogType: "article"
+
+# Twitter
+twitterCard: "summary_large_image"
+twitterCreator: "@paulo_dev"
+twitterImage: "/images/tutorial-blog-twitter.jpg"
+
+# Schema.org
+schemaType: "BlogPosting"
+articleSection: "Tutorial"
+articleTag: ["Blog", "Escriba", "Tutorial"]
+readingTime: "8 min"
+---
+```
+
+### Meta Tags Geradas
+
+O sistema gera automaticamente:
+
+- `<meta name="description" content="...">`
+- `<meta name="keywords" content="...">`
+- `<meta name="author" content="...">`
+- `<meta name="robots" content="...">`
+- `<link rel="canonical" href="...">`
+- `<meta property="og:title" content="...">`
+- `<meta property="og:description" content="...">`
+- `<meta property="og:image" content="...">`
+- `<meta name="twitter:card" content="...">`
+- `<meta name="twitter:title" content="...">`
+- `<script type="application/ld+json">` (Schema.org)
+
+### Sistema de Fallback
+
+Se um campo SEO não for especificado no front matter, o sistema usa:
+1. Valores do `seo.config.json`
+2. Valores padrão apropriados
+3. Campos derivados (ex: ogTitle = title)
+
+### Validação de SEO
+
+Para testar seu SEO:
+- **Facebook**: [Sharing Debugger](https://developers.facebook.com/tools/debug/)
+- **Twitter**: [Card Validator](https://cards-dev.twitter.com/validator)
+- **Google**: [Rich Results Test](https://search.google.com/test/rich-results)
+- **Schema.org**: [Validator](https://validator.schema.org/)
+
+## �📦 Dependências
 
 - **fs-extra**: Utilitários para sistema de arquivos
 - **gray-matter**: Parser para front matter YAML

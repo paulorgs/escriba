@@ -2,6 +2,18 @@
 title: Sobre o Blog
 layout: layout-page
 subtitle: Conheça mais sobre este projeto
+description: "Conheça o Escriba, um gerador de sites estáticos moderno e eficiente criado com Node.js"
+keywords: "sobre, escriba, gerador de sites, static site generator, node.js"
+author: "Equipe Escriba"
+# SEO para página estática
+robots: "index,follow"
+canonical: "https://meusite.com/sobre.html"
+# Open Graph
+ogTitle: "Sobre o Escriba - Gerador de Sites Estáticos"
+ogDescription: "Descubra como o Escriba pode revolucionar sua criação de sites estáticos"
+ogType: "website"
+# Schema.org structured data
+schemaType: "AboutPage"
 ---
 
 ## Bem-vindo ao Escriba! 👋

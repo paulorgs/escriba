@@ -1,0 +1,21 @@
+{
+  "site": {
+    "title": "Meu Blog",
+    "description": "Um blog criado com Escriba - gerador de sites estáticos",
+    "url": "https://meusite.com",
+    "author": "Seu Nome",
+    "language": "pt-BR",
+    "twitterSite": "@meusite",
+    "ogImage": "/images/og-default.jpg"
+  },
+  "defaults": {
+    "robots": "index,follow",
+    "ogType": "website",
+    "twitterCard": "summary_large_image"
+  },
+  "social": {
+    "twitter": "@meusite",
+    "facebook": "meusite",
+    "instagram": "@meusite"
+  }
+}
