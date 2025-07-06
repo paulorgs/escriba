@@ -41,9 +41,13 @@
   "seo": {
     "sitemap": true,
     "robots": true,
-    "rss": true,
+    "rss": false,
     "generateJsonLd": true,
     "minifyHtml": false,
-    "optimizeImages": true
+    "optimizeImages": false,
+    "canonicalUrl": {
+      "enforce": true,
+      "trailingSlash": false
+    }
   }
 }

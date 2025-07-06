@@ -3,7 +3,61 @@
 - 📱 **Design responsivo**: Layouts otimizados para todos os dispositivos
 - � **SEO otimizado**: Meta tags, Open Graph, Twitter Cards e dados estruturados
 - 📊 **Configuração SEO global**: Valores padrão centralizados para todo o site
-- 📁 **Estrutura recursiva**: Busca arquivos Markdown em todas as subpastas
+- 📁 **Estrutura recursiva**: Busca arq- **Twitter**: [Card Validator](https://cards-dev.twitter.com/validator)
+- **Google**: [Rich Results Test](https://search.google.com/test/rich-results)
+- **Schema.org**: [Validator](https://validator.schema.org/)
+- **Sitemap**: [XML Sitemap Validator](https://www.xml-sitemaps.com/validate-xml-sitemap.html)
+
+## 📊 Configuração Avançada
+
+### Site.config.json Completo
+
+```json
+{
+  "site": {
+    "title": "Meu Blog",
+    "description": "Descrição do site",
+    "url": "https://meusite.com",
+    "author": "Seu Nome",
+    "language": "pt-BR",
+    "twitterSite": "@meusite",
+    "ogImage": "/images/og-default.jpg",
+    "favicon": "/favicon.ico"
+  },
+  "defaults": {
+    "robots": "index,follow",
+    "ogType": "website",
+    "twitterCard": "summary_large_image"
+  },
+  "social": {
+    "twitter": "@meusite",
+    "github": "https://github.com/usuario/repo",
+    "linkedin": "https://linkedin.com/company/empresa",
+    "email": "contato@meusite.com"
+  },
+  "analytics": {
+    "googleAnalytics": "UA-XXXXXXXXX-X",
+    "googleTagManager": "GTM-XXXXXXX"
+  },
+  "seo": {
+    "sitemap": true,
+    "robots": true,
+    "canonicalUrl": {
+      "enforce": true,
+      "trailingSlash": false
+    }
+  }
+}
+```
+
+### Prioridade de Configuração
+
+1. **Front matter** do arquivo Markdown (maior prioridade)
+2. **site.config.json** (configuração principal)
+3. **seo.config.json** (fallback para compatibilidade)
+4. **Valores padrão** do sistema
+
+## 📦 Dependências Markdown em todas as subpastas
 Um gerador de site estático simples e eficiente construído em Node.js. Escriba converte arquivos Markdown em um site estático completo usando templates Handlebars.
 
 ## ✨ Características
@@ -49,6 +103,7 @@ escriba/
 │   ├── index.hbs         # Template da página inicial
 │   └── style.css         # Estilos CSS (copiado para public/)
 ├── seo.config.json   # Configuração global de SEO
+├── site.config.json  # Configuração avançada do site
 ├── public/           # Site gerado (pasta de saída)
 ├── build.js          # Script de build
 └── package.json
@@ -205,9 +260,45 @@ O Escriba inclui um **sistema completo de SEO** que gera automaticamente meta ta
 - **URLs canônicas**: Evita problemas de conteúdo duplicado
 - **Configuração global**: Valores padrão centralizados
 
-### Configuração Global (seo.config.json)
+### Configuração Global (site.config.json)
 
-Crie um arquivo `seo.config.json` na raiz do projeto:
+O Escriba agora usa `site.config.json` como configuração principal (com fallback para `seo.config.json`):
+
+```json
+{
+  "site": {
+    "title": "Meu Blog",
+    "description": "Um blog criado com Escriba - gerador de sites estáticos",
+    "url": "https://meusite.com",
+    "author": "Seu Nome",
+    "language": "pt-BR",
+    "twitterSite": "@meusite",
+    "ogImage": "/images/og-default.jpg"
+  },
+  "defaults": {
+    "robots": "index,follow",
+    "ogType": "website",
+    "twitterCard": "summary_large_image"
+  },
+  "social": {
+    "twitter": "@meusite",
+    "facebook": "meusite",
+    "instagram": "@meusite"
+  },
+  "seo": {
+    "sitemap": true,
+    "robots": true,
+    "canonicalUrl": {
+      "enforce": true,
+      "trailingSlash": false
+    }
+  }
+}
+```
+
+### Configuração Legacy (seo.config.json)
+
+Para compatibilidade, ainda é possível usar `seo.config.json`:
 
 ```json
 {
@@ -347,7 +438,46 @@ Se um campo SEO não for especificado no front matter, o sistema usa:
 2. Valores padrão apropriados
 3. Campos derivados (ex: ogTitle = title)
 
-### Validação de SEO
+### Sitemap e Robots.txt
+
+O Escriba gera automaticamente:
+
+#### Sitemap.xml
+- Lista todas as páginas do site com metadados SEO
+- Inclui `lastmod`, `changefreq` e `priority`
+- Pode ser desabilitado com `"sitemap": false` no `site.config.json`
+
+#### Robots.txt
+- Permite crawling de todas as páginas
+- Referencia o sitemap.xml
+- Permite acesso a arquivos CSS/JS
+- Pode ser desabilitado com `"robots": false` no `site.config.json`
+
+### URLs Canônicas
+
+O sistema automaticamente gera URLs canônicas para evitar conteúdo duplicado:
+
+```yaml
+---
+# URL canônica automática: https://seusite.com/nome-do-arquivo.html
+title: "Meu Post"
+
+# URL canônica personalizada
+canonical: "https://seusite.com/url-preferida.html"
+---
+```
+
+**Configuração global**:
+```json
+{
+  "seo": {
+    "canonicalUrl": {
+      "enforce": true,        // Sempre incluir canonical
+      "trailingSlash": false  // Remove / no final das URLs
+    }
+  }
+}
+```
 
 Para testar seu SEO:
 - **Facebook**: [Sharing Debugger](https://developers.facebook.com/tools/debug/)

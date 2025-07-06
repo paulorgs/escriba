@@ -156,6 +156,7 @@ const templatesDir = path.join(__dirname, 'templates');
 const indexPath = path.join(__dirname, 'templates/index.hbs');
 const outputDir = path.join(__dirname, 'public');
 const seoConfigPath = path.join(__dirname, 'seo.config.json');
+const siteConfigPath = path.join(__dirname, 'site.config.json');
 
 // Cache para templates compilados
 const templateCache = new Map();
@@ -182,15 +183,33 @@ async function getTemplate(layoutName) {
 async function buildSite() {
   await fse.emptyDir(outputDir);
 
-  // Carrega configuração SEO
+  // Carrega configuração do site
+  let siteConfig = {};
+  try {
+    const siteConfigContent = await fs.readFile(siteConfigPath, 'utf-8');
+    siteConfig = JSON.parse(siteConfigContent);
+  } catch (error) {
+    console.warn('⚠️  Arquivo site.config.json não encontrado. Usando configuração padrão.');
+    siteConfig = {
+      site: {
+        title: "Meu Blog",
+        description: "Um blog criado com Escriba",
+        url: "https://localhost:3000",
+        author: "",
+        language: "pt-BR"
+      }
+    };
+  }
+
+  // Carrega configuração SEO (mantém compatibilidade)
   let seoConfig = {};
   try {
     const seoConfigContent = await fs.readFile(seoConfigPath, 'utf-8');
     seoConfig = JSON.parse(seoConfigContent);
   } catch (error) {
-    console.warn('⚠️  Arquivo seo.config.json não encontrado. Usando valores padrão.');
+    console.warn('⚠️  Arquivo seo.config.json não encontrado. Usando valores do site.config.json.');
     seoConfig = {
-      site: {
+      site: siteConfig.site || {
         title: "Meu Blog",
         description: "Um blog criado com Escriba",
         url: "https://localhost:3000",
@@ -204,6 +223,14 @@ async function buildSite() {
       }
     };
   }
+
+  // Merge das configurações (site.config.json tem prioridade)
+  const finalConfig = {
+    site: { ...seoConfig.site, ...siteConfig.site },
+    defaults: { ...seoConfig.defaults, ...siteConfig.defaults },
+    social: { ...seoConfig.social, ...siteConfig.social },
+    seo: siteConfig.seo || {}
+  };
 
   // Copia o arquivo CSS se existir na pasta templates
   const templateCssPath = path.join(__dirname, 'templates/style.css');
@@ -225,6 +252,7 @@ async function buildSite() {
 
   const files = await getMarkdownFiles(contentDir);
   const posts = [];
+  const allPages = []; // Para o sitemap
 
   for (const file of files) {
     const rawContent = await fs.readFile(file, 'utf-8');
@@ -245,22 +273,22 @@ async function buildSite() {
       content: contentHtml,
       layout: layoutName,
       // SEO data com fallbacks da configuração
-      description: frontmatter.description || seoConfig.site?.description || '',
+      description: frontmatter.description || finalConfig.site?.description || '',
       keywords: frontmatter.keywords || '',
-      author: frontmatter.author || seoConfig.site?.author || '',
-      image: frontmatter.image || seoConfig.site?.ogImage || '',
-      canonical: frontmatter.canonical || `${seoConfig.site?.url || ''}/${slug}`,
-      robots: frontmatter.robots || seoConfig.defaults?.robots || 'index,follow',
+      author: frontmatter.author || finalConfig.site?.author || '',
+      image: frontmatter.image || finalConfig.site?.ogImage || '',
+      canonical: frontmatter.canonical || `${finalConfig.site?.url || ''}/${slug}`,
+      robots: frontmatter.robots || finalConfig.defaults?.robots || 'index,follow',
       // Open Graph
       ogTitle: frontmatter.ogTitle || frontmatter.title || path.basename(file, '.md'),
-      ogDescription: frontmatter.ogDescription || frontmatter.description || seoConfig.site?.description || '',
-      ogImage: frontmatter.ogImage || frontmatter.image || seoConfig.site?.ogImage || '',
-      ogType: frontmatter.ogType || (layoutName === 'layout-post' ? 'article' : seoConfig.defaults?.ogType || 'website'),
-      ogLocale: frontmatter.ogLocale || seoConfig.site?.language || 'pt-BR',
+      ogDescription: frontmatter.ogDescription || frontmatter.description || finalConfig.site?.description || '',
+      ogImage: frontmatter.ogImage || frontmatter.image || finalConfig.site?.ogImage || '',
+      ogType: frontmatter.ogType || (layoutName === 'layout-post' ? 'article' : finalConfig.defaults?.ogType || 'website'),
+      ogLocale: frontmatter.ogLocale || finalConfig.site?.language || 'pt-BR',
       // Twitter Cards
-      twitterCard: frontmatter.twitterCard || seoConfig.defaults?.twitterCard || 'summary_large_image',
-      twitterSite: frontmatter.twitterSite || seoConfig.site?.twitterSite || '',
-      twitterCreator: frontmatter.twitterCreator || seoConfig.social?.twitter || '',
+      twitterCard: frontmatter.twitterCard || finalConfig.defaults?.twitterCard || 'summary_large_image',
+      twitterSite: frontmatter.twitterSite || finalConfig.site?.twitterSite || '',
+      twitterCreator: frontmatter.twitterCreator || finalConfig.social?.twitter || '',
       twitterTitle: frontmatter.twitterTitle || frontmatter.title,
       twitterDescription: frontmatter.twitterDescription || frontmatter.description,
       twitterImage: frontmatter.twitterImage || frontmatter.image,
@@ -270,7 +298,7 @@ async function buildSite() {
       // Schema.org structured data
       schemaType: frontmatter.schemaType || (layoutName === 'layout-post' ? 'BlogPosting' : undefined),
       schemaAuthor: frontmatter.schemaAuthor || frontmatter.author,
-      schemaPublisher: frontmatter.schemaPublisher || seoConfig.site?.title || 'Escriba Blog',
+      schemaPublisher: frontmatter.schemaPublisher || finalConfig.site?.title || 'Escriba Blog',
       schemaImage: frontmatter.schemaImage || frontmatter.image,
       schemaWordCount: frontmatter.schemaWordCount,
       // Adiciona todos os campos do frontmatter
@@ -279,6 +307,14 @@ async function buildSite() {
 
     const html = layoutTemplate(postData);
     await fs.writeFile(outputPath, html, 'utf-8');
+
+    // Adiciona à lista de todas as páginas para o sitemap
+    allPages.push({
+      url: slug,
+      lastmod: frontmatter.date ? new Date(frontmatter.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      changefreq: layoutName === 'layout-post' ? 'monthly' : 'yearly',
+      priority: layoutName === 'layout-post' ? '0.8' : '0.6'
+    });
 
     // Adiciona à lista de posts apenas se não for uma página estática
     if (layoutName !== 'layout-page') {
@@ -298,15 +334,39 @@ async function buildSite() {
 
   // Gera o index.html
   const indexHtml = indexTemplate({
-    siteTitle: 'Meu Blog',
+    siteTitle: finalConfig.site?.title || 'Meu Blog',
     posts,
   });
 
   await fs.writeFile(path.join(outputDir, 'index.html'), indexHtml, 'utf-8');
 
+  // Adiciona index.html ao sitemap
+  allPages.unshift({
+    url: 'index.html',
+    lastmod: new Date().toISOString().split('T')[0],
+    changefreq: 'weekly',
+    priority: '1.0'
+  });
+
+  // Gera sitemap.xml se habilitado
+  if (finalConfig.seo?.sitemap !== false) {
+    await generateSitemap(allPages, finalConfig.site?.url || 'https://localhost:3000');
+  }
+
+  // Gera robots.txt se habilitado
+  if (finalConfig.seo?.robots !== false) {
+    await generateRobotsTxt(finalConfig.site?.url || 'https://localhost:3000');
+  }
+
   console.log('✅ Site gerado com sucesso!');
   console.log(`📁 ${files.length} arquivos processados`);
   console.log(`📝 ${posts.length} posts adicionados ao índice`);
+  if (finalConfig.seo?.sitemap !== false) {
+    console.log('🗺️  Sitemap gerado em /sitemap.xml');
+  }
+  if (finalConfig.seo?.robots !== false) {
+    console.log('🤖 Robots.txt gerado em /robots.txt');
+  }
 }
 
 async function getMarkdownFiles(dir) {
@@ -322,6 +382,44 @@ async function getMarkdownFiles(dir) {
     }
   }));
   return files.flat().filter(Boolean);
+}
+
+// Gera sitemap.xml
+async function generateSitemap(pages, baseUrl) {
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(page => `  <url>
+    <loc>${baseUrl}/${page.url}</loc>
+    <lastmod>${page.lastmod}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+  await fs.writeFile(path.join(outputDir, 'sitemap.xml'), sitemap, 'utf-8');
+}
+
+// Gera robots.txt
+async function generateRobotsTxt(baseUrl) {
+  const robotsTxt = `User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: ${baseUrl}/sitemap.xml
+
+# Disallow admin areas (if any)
+# Disallow: /admin/
+# Disallow: /.env
+
+# Allow search engines to crawl CSS and JS files
+Allow: /style.css
+Allow: /*.css
+Allow: /*.js
+
+# Crawl-delay (optional)
+# Crawl-delay: 1`;
+
+  await fs.writeFile(path.join(outputDir, 'robots.txt'), robotsTxt, 'utf-8');
 }
 
 buildSite().catch(console.error);
