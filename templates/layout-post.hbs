@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{title}}</title>
+  <title>{{title}} | Blog</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <header class="site-header">
     <h1>{{title}}</h1>
-    {{#if date}}
-      <div class="meta">
+    <div class="meta">
+      {{#if date}}
         <span class="meta-item">📅 {{date}}</span>
-        <span class="badge badge-default">PADRÃO</span>
-        {{#if author}}
-          <span class="meta-item">✍️ {{author}}</span>
-        {{/if}}
-      </div>
-    {{/if}}
+      {{/if}}
+      <span class="badge badge-post">POST</span>
+      {{#if author}}
+        <span class="meta-item">✍️ {{author}}</span>
+      {{/if}}
+    </div>
   </header>
   
   <main class="main-content">

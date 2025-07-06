@@ -1,18 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{siteTitle}}</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .posts-grid {
+      display: grid;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .post-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-small);
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+    }
+    
+    .post-card:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-2px);
+    }
+    
+    .post-title {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+    
+    .post-title a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .post-title a:hover {
+      color: var(--primary-color);
+    }
+    
+    .post-meta {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-light);
+    }
+    
+    .stats {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h1>{{siteTitle}}</h1>
-  <ul>
-    {{#each posts}}
-      <li>
-        <a href="{{url}}">{{title}}</a>
-        <small>{{date}}</small>
-      </li>
-    {{/each}}
-  </ul>
+  <header class="site-header hero">
+    <h1>{{siteTitle}}</h1>
+    <div class="subtitle">Gerador de sites estáticos com Escriba</div>
+    <div class="badge badge-page">📚 BLOG</div>
+  </header>
+  
+  <main class="main-content">
+    {{#if posts}}
+      <div class="stats">
+        <strong>📊 {{posts.length}} {{#if (eq posts.length 1)}}post publicado{{else}}posts publicados{{/if}}</strong>
+      </div>
+      
+      <div class="posts-grid">
+        {{#each posts}}
+          <article class="post-card">
+            <h2 class="post-title">
+              <a href="{{url}}">{{title}}</a>
+            </h2>
+            <div class="post-meta">
+              {{#if date}}
+                <span class="meta-item">📅 {{date}}</span>
+              {{/if}}
+              {{#if layout}}
+                <span class="badge {{#if (eq layout 'layout-post')}}badge-post{{else}}badge-default{{/if}}">
+                  {{#if (eq layout 'layout-post')}}POST{{else}}PADRÃO{{/if}}
+                </span>
+              {{/if}}
+            </div>
+          </article>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-state">
+        <h2>📝 Nenhum post encontrado</h2>
+        <p>Adicione arquivos Markdown na pasta <code>content/</code> e execute <code>npm run build</code></p>
+        <a href="#" class="nav-button" onclick="window.location.reload()">🔄 Recarregar</a>
+      </div>
+    {{/if}}
+  </main>
+  
+  <footer class="site-footer">
+    <p>Gerado com ❤️ pelo <strong>Escriba</strong></p>
+  </footer>
 </body>
 </html>

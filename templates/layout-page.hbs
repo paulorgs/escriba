@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="site-header hero">
+    <h1>{{title}}</h1>
+    {{#if subtitle}}
+      <div class="subtitle">{{subtitle}}</div>
+    {{/if}}
+    <div class="badge badge-page">📄 PÁGINA</div>
+  </header>
+  
+  <main class="main-content card">
+    {{{content}}}
+  </main>
+  
+  <footer class="site-footer">
+    <a href="/" class="nav-button primary">🏠 Página Inicial</a>
+  </footer>
+</body>
+</html>
