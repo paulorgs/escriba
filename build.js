@@ -167,6 +167,70 @@ Handlebars.registerHelper('cookieButton', function(text, className) {
   `);
 });
 
+// Helper para gerar navbar
+Handlebars.registerHelper('navbar', function(currentPage) {
+  const pages = [
+    { url: '/', title: 'Home', icon: '🏠' },
+    { url: '/sobre', title: 'Sobre', icon: '👋' },
+    { url: '/politica-privacidade', title: 'Privacidade', icon: '🔒' }
+  ];
+  
+  const navItems = pages.map(page => {
+    const isActive = (currentPage === page.url) || 
+                    (currentPage === 'index.html' && page.url === '/') ||
+                    (currentPage === 'sobre.html' && page.url === '/sobre') ||
+                    (currentPage === 'politica-privacidade.html' && page.url === '/politica-privacidade');
+    
+    const activeClass = isActive ? ' active' : '';
+    const href = page.url === '/' ? '/' : `${page.url}.html`;
+    
+    return `
+      <li>
+        <a href="${href}" class="nav-link${activeClass}">
+          <span class="nav-icon">${page.icon}</span>
+          <span class="nav-text">${page.title}</span>
+        </a>
+      </li>
+    `;
+  }).join('');
+  
+  return new Handlebars.SafeString(`
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a href="/" class="navbar-brand">
+          <span>📖</span>
+          <span>Escriba</span>
+        </a>
+        
+        <button class="navbar-toggle" onclick="toggleMobileNav()">
+          ☰
+        </button>
+        
+        <ul class="navbar-nav" id="navbar-nav">
+          ${navItems}
+        </ul>
+      </div>
+    </nav>
+    
+    <script>
+      function toggleMobileNav() {
+        const nav = document.getElementById('navbar-nav');
+        nav.classList.toggle('active');
+      }
+      
+      // Fecha o menu mobile ao clicar fora
+      document.addEventListener('click', function(event) {
+        const nav = document.getElementById('navbar-nav');
+        const toggle = document.querySelector('.navbar-toggle');
+        
+        if (!nav.contains(event.target) && !toggle.contains(event.target)) {
+          nav.classList.remove('active');
+        }
+      });
+    </script>
+  `);
+});
+
 const contentDir = path.join(__dirname, 'content');
 const templatesDir = path.join(__dirname, 'templates');
 const indexPath = path.join(__dirname, 'templates/index.hbs');
